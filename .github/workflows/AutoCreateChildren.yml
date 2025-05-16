@@ -1,0 +1,40 @@
+name: AutoCreate Child Actions with Specific Types and Assignments
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  create_and_update_sub_items:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      
+    steps:     
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Set up GitHub CLI
+        uses: actions/github-script@v7 # Or actions4gh/setup-gh@v1
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            echo "Issue Type: ${{ github.event.issue.type }}"
+            if [[ "${{ github.event.issue.type }}" == "Feature" ]] || [[ "${{ github.event.issue.type }}" == "SampleTest2" ]] || [[ "${{ github.event.issue.type }}" == "SampleTest3" ]]; then
+              echo "Creating 13 specific sub-items..."
+              gh issue create --title "01) Develop Test Plan: $ISSUE_TITLE" --body "Related to issue #$ISSUE_NUMBER"
+              echo "CREATED_ISSUE_01=$(gh issue view --json number -q '.number')" >> $GITHUB_ENV
+              echo "Setting specific issue types..."
+              gh issue edit "$CREATED_ISSUE_01" --type task
+              echo "Issue types updated."
+              echo "Linking sub-items to parent issue #$ISSUE_NUMBER..."
+              gh issue link "$CREATED_ISSUE_01" "$ISSUE_NUMBER" --relation "part of"
+              echo "Sub-items linked to parent."
+            else
+              echo "Issue type is not 'Feature', 'SampleTest2', or 'SampleTest3'. Skipping sub-item creation."
+            fi
