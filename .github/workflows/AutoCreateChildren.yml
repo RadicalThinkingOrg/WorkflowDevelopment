@@ -22,7 +22,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            echo Issue Type: ${{ github.event.issue.type }}
+            echo "Issue Type: ${{ github.event.issue.type }}"
             if [[ "${{ github.event.issue.type }}" == "Feature" ]] || [[ "${{ github.event.issue.type }}" == "SampleTest2" ]] || [[ "${{ github.event.issue.type }}" == "SampleTest3" ]]; then
               echo Creating 13 specific sub-items...
             else
