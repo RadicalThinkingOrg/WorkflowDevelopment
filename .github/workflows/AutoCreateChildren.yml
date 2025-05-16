@@ -5,16 +5,15 @@ on:
     types: [opened]
 
 jobs:
-  create_and_update_sub_items:
+  debug_event_data:
     runs-on: ubuntu-latest
     permissions:
       issues: write
-      
-    steps:     
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+
+    steps:
       - uses: actions/checkout@v4
-      
-      - name: Set up GitHub CLI
+
+      - name: Log Issue Event Data
         uses: actions/github-script@v7
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
@@ -22,4 +21,4 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            echo "Issue Type: ${{ github.event.issue.type }}"
+            console.log(JSON.stringify(github.event.issue, null, 2));
